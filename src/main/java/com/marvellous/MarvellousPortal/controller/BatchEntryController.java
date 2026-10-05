@@ -32,9 +32,16 @@ public class BatchEntryController
         }
     }
 
-    @PostMapping
-    public ResponseEntity<BatchEntry> createEntry(@RequestBody BatchEntry myentry)
+        @PostMapping
+    public ResponseEntity<?> createEntry(@RequestBody BatchEntry myentry)
     {
+        // 1. Framework Guardrail: Check if inputs are missing or invalid
+        if (myentry.getName() == null || myentry.getName().trim().isEmpty() || myentry.getFees() <= 0) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Validation failed: Batch name cannot be empty and fees must be greater than 0.");
+        }
+
         try
         {
             batchEntryService.saveEntry(myentry);
@@ -45,6 +52,7 @@ public class BatchEntryController
             return  new ResponseEntity<BatchEntry>(HttpStatus.BAD_REQUEST);
         }
     }
+
 
     @GetMapping("/id/{myid}")
     public ResponseEntity<BatchEntry> getBatchEntryById(@PathVariable ObjectId myid)
